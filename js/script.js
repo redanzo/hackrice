@@ -3,6 +3,10 @@
 
 const PEXELS_API_KEY = 'biVzGfa9rbzQFcQ22s9Tcptpw9qK7AJb8Wa8wwmMpG8gMZuTYAO9KFzG'; // Replace with your actual API key
 
+// const Scraper = require('../scraper/index');
+
+// import Scraper from "../scraper/index.js";
+
 const param = new URLSearchParams(window.location.search)
 let query = (param.has('q')) ? param.get('q') : "" // query holds the value of 'q' param sent through the url
 const values = {
@@ -50,6 +54,7 @@ const values = {
 
 let code = '';
 let defaultPrompt = '';
+let question = '';
 
 window.onload = () => {
 
@@ -73,9 +78,25 @@ window.onload = () => {
     document.querySelectorAll('.w-layout-grid.grid-7 .text-block-12').forEach((element, index) => {
         element.innerHTML = selectedValues[index];
         element.onclick = () => {
+
             document.querySelectorAll('.w-layout-grid.grid-7 .text-block-12').forEach((element) => element.classList.remove('highlight'))
             element.classList.add('highlight');
             code = selectedValues[index];
+            let count = 0
+            document.getElementById('related-articles-header').style.display = 'block'
+            updatedData.forEach(company_stock_news_list => {
+                if (company_stock_news_list.code === code) {
+                    // company_stock_news_list.news.forEach(nws => {
+                    fetchArticles(company_stock_news_list.news.slice(0, 50), count++);
+                    // break
+                    // console.log('yessir')
+                    // });
+                    return;
+                }
+                // console.log('uiop');
+                // return;
+            });
+
             document.querySelector('iframe').src = `https://api.stockdio.com/visualization/financial/charts/v1/PricesChange?app-key=B0C6A025780B48E1B1800F375F2F3610&symbol=${selectedValues[index]}&days=3&palette=Excite-Bike&allowPeriodChange=false&backgroundColor=f0f0f0&negativeColor=f04747&positiveColor=43b581&axesLinesColor=f0f0f0&showLogo=Title&animate=true`;
             !document.querySelector('#overlay').classList.contains('hide') && document.querySelector('#overlay').classList.add('hide');
 
@@ -93,6 +114,76 @@ window.onload = () => {
                 .catch((error) => {
                     console.error("Error:", error);
                 });
+        }
+    });
+
+    document.getElementById("playButton").addEventListener("click", () => {
+        defaultPrompt = `Write 1-2 sentences about a fake new article scenario regarding about ${code}!`;
+        const qBox = document.querySelector(".question-box .question p");
+
+        generateResponse = fetch("http://168.5.168.190:50000/generateResponse", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ defaultPrompt }),
+        }).then((response) => response.json())
+            .then((data) => {
+                qBox.innerHTML = `${data.answer} Would you think there will be a positive or negative trend on this?`;
+                question = data.answer;
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+            });
+    })
+
+    const sendButton = document.getElementById('send-btn');
+    const messageInput = document.getElementById('messageInput');
+    const responseParagraph = document.querySelector('.response p');
+
+    sendButton.addEventListener('click', () => {
+        const message = messageInput.value.trim();
+        if (message) {
+            responseParagraph.textContent = message;
+            messageInput.value = '';
+
+            defaultPrompt = `In 1 sentence is this "Correct/Incorrect" response to the given news in the question? Give 2-3 sentence feedback to user who answered the question ${question} as: ${message}`;
+            // console.log(defaultPrompt);
+            const qBox = document.querySelector(".question-box .botResponse p");
+
+            generateResponse = fetch("http://168.5.168.190:50000/generateResponse", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ defaultPrompt }),
+            }).then((response) => response.json())
+                .then((data) => {
+                    qBox.innerHTML = `${data.answer}`;
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                });
+        }
+    });
+
+
+
+    document.getElementById("playButton").addEventListener("click", () => {
+        const additionalBox = document.querySelector(".additional-box");
+        const questionBox = document.querySelector(".question-box");
+        const playIcon = document.querySelector("#playButton .play-icon");
+        const xIcon = document.querySelector("#playButton .x-icon");
+
+        additionalBox.classList.toggle("hidden");
+        questionBox.classList.toggle("hidden");
+        playIcon.classList.toggle("hidden");
+        xIcon.classList.toggle("hidden");
+
+        if (additionalBox.classList.contains("hidden")) {
+            questionBox.classList.remove("hidden");
+        } else {
+            questionBox.classList.add("hidden");
         }
     });
 
@@ -125,8 +216,8 @@ window.onload = () => {
 
     const article_gallery = document.getElementById('article-gallery');
 
-    async function fetchArticles() {
-        const url = 'https://api.pexels.com/v1/search?query=stock&per_page=5'; // Adjust query as needed
+    async function fetchArticles(postedData, count) {
+        const url = 'https://api.pexels.com/v1/search?query=stock&per_page=50'; // Adjust query as needed
 
         try {
             const response = await fetch(url, {
@@ -136,35 +227,58 @@ window.onload = () => {
             });
 
             const data = await response.json();
-            displayArticles(data.photos); // Assuming you're fetching photos
+            displayArticles(data.photos, postedData, count); // Assuming you're fetching photos
         } catch (error) {
             console.error('Error fetching articles:', error);
         }
 
 
     }
-    console.log('articles ', MSFT.news);
-    async function displayArticles(photos_data) {
+    // console.log('articles ', MSFT.news);
+    async function displayArticles(photos_data, postedData, count) {
         const article_gallery = document.getElementById('article-gallery');
         article_gallery.innerHTML = ''; // Clear existing articles
 
-        photos_data.forEach(photo => {
+        postedData.forEach(pd => {
+            // let count = 0;
+            let x = Math.floor(Math.random() * 50);
+            // console.log(x)
+            let photo = photos_data[x];
+            // console.log(photo);
             const anchor = document.createElement('a');
-            anchor.href = photo.url; // Adjust as needed
+            anchor.href = pd.url; // Adjust as needed
             anchor.classList.add('article-item');
+            anchor.target = '_blank';
 
             const img = document.createElement('img');
             img.src = photo.src.medium; // Use the medium size image
             img.alt = photo.alt; // Set alt text
 
             const p = document.createElement('p');
-            // p.textContent = MSFT; // Or any other relevant text
+            p.textContent = pd.title; // Or any other relevant text
 
             anchor.appendChild(img);
             anchor.appendChild(p);
             article_gallery.appendChild(anchor);
         });
     }
+
+    // console.log(updatedData[0].news[0].title);
+
+    // updatedData.forEach(company_stock_news_list => {
+    //     if (company_stock_news_list.code === code) {
+    //         //         //             company_stock_news_list.news.forEach(nws => {
+    //         //         //             fetchArticles(nws);
+    //         //         //             // break
+    //         console.log('yessir')
+    //         // });
+    //         //         // return
+    //         return;
+    //     }
+    //     console.log('uiop');
+    //     return;
+    // });
+
 
     // MSFT.news.forEach(article => {
 
@@ -184,5 +298,8 @@ window.onload = () => {
     //     article_gallery.appendChild(anchor);
     // });
 
-    fetchArticles();
+    // fetchArticles();
+
+    // document.querySelector
+
 };

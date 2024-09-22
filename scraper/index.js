@@ -1,4 +1,4 @@
-const puppeteer = require('puppeteer-core');
+const puppeteer = require('puppeteer');
 
 class Scraper {
 
@@ -15,11 +15,11 @@ class Scraper {
 
     async init() {
         const browser = await puppeteer.launch({
-            executablePath: 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
             headless: this.headless
         });
         const page = await browser.newPage();
         await page.goto(`${this.baseURL}${this.query}`);
+        await page.waitForNetworkIdle();
         const result = await page.evaluate(() => {
             const data = {};
             data.code = document.querySelector('.quote-header_ticker-wrapper .js-recent-quote-ticker').innerText;
