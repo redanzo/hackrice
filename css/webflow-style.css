@@ -3433,11 +3433,13 @@ textarea.w-select {
   height: 720px;
   background: white;
   z-index: 4;
+  pointer-events: auto !important;
 }
 
 #overlay.hide {
   background: transparent;
   z-index: auto;
+  pointer-events: none;
 }
 
 #back {

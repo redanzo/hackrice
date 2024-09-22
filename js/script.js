@@ -55,6 +55,11 @@ const values = {
 let code = '';
 let defaultPrompt = '';
 let question = '';
+let cT1 = '';
+let cT2 = '';
+let cT3 = '';
+let cT4 = '';
+let date = '';
 
 window.onload = () => {
 
@@ -101,7 +106,7 @@ window.onload = () => {
             !document.querySelector('#overlay').classList.contains('hide') && document.querySelector('#overlay').classList.add('hide');
 
             defaultPrompt = `Give me a short 3-4 education description sentences on why ${code} stock has gone down based on these news articles: ${combinedTitles}`;
-            const generateResponse = fetch("http://168.5.168.190:50000/generateResponse", {
+            let generateResponse = fetch("http://168.5.168.190:50000/generateResponse", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -110,10 +115,76 @@ window.onload = () => {
             }).then((response) => response.json())
                 .then((data) => {
                     paragraph.innerHTML = data.answer;
+                    cT4 = data.answer;
                 })
                 .catch((error) => {
                     console.error("Error:", error);
                 });
+            
+            date = "Sep 19 2024";
+            const combinedTitles1 = MSFT.news
+            .filter(newsItem => newsItem.timestamp.includes(date))
+            .slice(0, 5)
+            .map(newsItem => newsItem.title)
+            .join(', ');
+            defaultPrompt = `Give me a short 3-4 education description sentences on why ${code} stock has gone down based on these news articles: ${combinedTitles1}`;
+            generateResponse = fetch("http://168.5.168.190:50000/generateResponse", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ defaultPrompt }),
+            }).then((response) => response.json())
+                .then((data) => {
+                    cT1 = data.answer;
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                });
+
+                date = "Sep 20 2024";
+                const combinedTitles2 = MSFT.news
+                .filter(newsItem => newsItem.timestamp.includes(date))
+                .slice(0, 5)
+                .map(newsItem => newsItem.title)
+                .join(', ');
+                defaultPrompt = `Give me a short 3-4 education description sentences on why ${code} stock has gone down based on these news articles: ${combinedTitles2}`;
+                generateResponse = fetch("http://168.5.168.190:50000/generateResponse", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ defaultPrompt }),
+                }).then((response) => response.json())
+                    .then((data) => {
+                        cT2 = data.answer;
+                    })
+                    .catch((error) => {
+                        console.error("Error:", error);
+                    });
+
+                    date = "Sep 21 2024";
+                    const combinedTitles3 = MSFT.news
+                    .filter(newsItem => newsItem.timestamp.includes(date))
+                    .slice(0, 5)
+                    .map(newsItem => newsItem.title)
+                    .join(', ');
+                    defaultPrompt = `Give me a short 3-4 education description sentences on why ${code} stock has gone down based on these news articles: ${combinedTitles3}`;
+                    generateResponse = fetch("http://168.5.168.190:50000/generateResponse", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ defaultPrompt }),
+                    }).then((response) => response.json())
+                        .then((data) => {
+                            cT3 = data.answer;
+                        })
+                        .catch((error) => {
+                            console.error("Error:", error);
+                        });
+
+
         }
     });
 
@@ -197,15 +268,23 @@ window.onload = () => {
     let s1 = [0, 1100 / 3];
     let s2 = [s1[1], s1[1] * 2];
     let s3 = [s2[1], 1100];
+    let current= 0
 
     function updateDisplay(event) {
+        
         if (event.pageX > s1[0] && event.pageX < s1[1]) {
-            console.log('s1')
+            paragraph.innerHTML = cT1;
+            
         } else if (event.pageX > s2[0] && event.pageX < s2[1]) {
-            console.log('s2')
+            paragraph.innerHTML = cT2;
+
         } else if (event.pageX > s3[0] && event.pageX < s3[1]) {
-            console.log('s3')
+            paragraph.innerHTML = cT3;
+
+        } else {
+            paragraph.innerHTML = cT4;
         }
+        console.log("here")
         // console.log(event.pageX)
     }
 
