@@ -88,7 +88,7 @@ window.onload = () => {
                 body: JSON.stringify({ defaultPrompt }),
             }).then((response) => response.json())
                 .then((data) => {
-                    console.log(data); // Handle the response here
+                    paragraph.innerHTML = data.answer;
                 })
                 .catch((error) => {
                     console.error("Error:", error);
