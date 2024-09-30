@@ -1,0 +1,26 @@
+Give me a short 3-4 education description sentences on why {STOCK} stock has gone down based on these news articles: {news[.]}
+
+
+
+Give me ONLY a numerical value between 0 and 100 representing the overall sentiment(AND NOTHING ELSE, NO OTHER WORDS), where 100 indicates extremely positive sentiment and 0 indicates extremely negative sentiment. Related to {STOCK} stock today. Consider factors like word choice, tone, and overall context. Based on these article titles and the stock price change as recent as possible: 
+
+i; q; a;
+
+i = 1;
+prompt: Give me a simple sentence on a fake news that will affect {STOCK}
+q = response from gemini
+
+To user:
+q + "Would you think there will be a positive or negative trend on this {Stock}?"
+input = user;
+
+i = 2;
+prompt: In 1 sentence is this "Correct/Incorrect" response to the given news in the question? Give 2-3 sentence feedback to user who answered the question "{q}" as: {input}
+feedback = response from gemini
+
+
+to user:
+feedback
+
+-> next question go back to i=1
+
