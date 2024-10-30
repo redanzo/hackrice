@@ -1,7 +1,7 @@
 // import { GoogleGenerativeAI } from "@google/generative-ai";
 // const genAI = new GoogleGenerativeAI("AIzaSyDR2WDnon59BCwqOxF2Q6fvQCMuJL20BL8");
 
-const PEXELS_API_KEY = 'biVzGfa9rbzQFcQ22s9Tcptpw9qK7AJb8Wa8wwmMpG8gMZuTYAO9KFzG'; // Replace with your actual API key
+const PEXELS_API_KEY = ''; // Replace with your actual API key
 
 // const Scraper = require('../scraper/index');
 
